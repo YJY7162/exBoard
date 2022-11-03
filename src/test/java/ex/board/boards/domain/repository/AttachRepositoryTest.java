@@ -25,7 +25,7 @@ class AttachRepositoryTest {
     AttachRepository attachRepository;
 
     @Autowired
-    BoardRepository boardRepository;
+    BoardRepository boardRepository;//
 
     @Test
     public void findAttachListTest() {
