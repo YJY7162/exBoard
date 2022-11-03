@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>Insert title here</title>
+    <style>
+        img { max-width:100%; height: auto; }
+        table { max-width:100%; }
+    </style>
+</head>
+<body>
+    <input type="hidden" name="boardId" th:value="${param.boardId}"></input>
+    <h1 th:text="${param.boardId}"></h1>
+    <div class = "boardContent" id = "boardContent">
+    <div class = "uploadResult" id = "downFile">
+</div>
+
+<script src="http://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function(){
+        let boardId = $("[name='boardId']").val();
+        console.log(boardId);
+        $.ajax({
+            url: "/boards/"+boardId,
+            method: "get",
+            dataType: "json",
+            success:function (data) {
+                console.log(data);
+                const boardSubject = "<p>"+data.boardSubject+"</p>";
+                const boardContent = data.boardContent;
+                const output = boardSubject + boardContent;
+                document.getElementById('boardContent').innerHTML = output;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+            }
+        })
+    });
+
+    $(function(){
+        let boardId = $("[name='boardId']").val();
+        console.log(boardId);
+        $.ajax({
+            url: "/boards/attachList/"+boardId,
+            method: "get",
+            dataType: "json",
+            success:function (data) {
+
+                let attachListDtos = data.attachListDtos;
+                console.log(attachFiles);
+
+                let output = "";
+                $.each(attachListDtos, function () {
+                    output += "<div>";
+                    output += "<p>"+this.fileName+"</p>"
+                    output += "<form action = 'boards/download/" + this.attachId+"'>"
+                    output += "<input type = 'submit' value = 'download'></input></form>"
+                    output += "</div>"
+
+                });
+                document.getElementById('downFile').innerHTML = output;
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+            }
+        })
+    });
+
+
+</script>
+
+
+</body>
+</html>

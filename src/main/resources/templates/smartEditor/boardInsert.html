@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type="text/javascript" src="/smartEditor/js/HuskyEZCreator.js" charset="utf-8"></script>
+</head>
+<body>
+    <h3>Naver Smart Editor 2.0</h3>
+        <div id="smartEditor">
+            <input type="text" name="boardSubject" id="boardSubject" placeholder="제목 입력"><br>
+            <textarea name="editorTxt" id="editorTxt" rows="20" cols="10" placeholder="내용을 입력해주세요"
+                      style="width: 1000px"></textarea>
+            <input type="file" id="attachFiles" name="attachFiles" multiple="multiple">
+        </div>
+    <button id="insertBtn">입력</button>
+    <script src="http://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--    <script type="text/javascript" src="attach_photo.js" charset="utf-8"></script>-->
+<script>
+    let oEditors = [];
+
+    smartEditor = function () {
+        console.log("Naver SmartEditor");
+        nhn.husky.EZCreator.createInIFrame({
+            oAppRef: oEditors,
+            elPlaceHolder: "editorTxt",
+            sSkinURI: "/smartEditor/SmartEditor2Skin.html",
+            fCreator: "createSEditor2"
+        })
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        smartEditor();
+        console.log("1111");
+    });
+
+    const insertBtn = document.getElementById("insertBtn");
+
+    function insertBoard() {
+        oEditors.getById["editorTxt"].exec("UPDATE_CONTENTS_FIELD", []);
+        const boardSubject = $("[name='boardSubject']").val();
+        const editorTxt = $('#editorTxt').val();
+        console.log(boardSubject);
+        console.log(editorTxt);
+        // let uploadFilesList = uploadFiles;
+        let boardInsertDto = JSON.stringify({
+            'boardSubject' : boardSubject,
+            'boardContent' : editorTxt,
+            'attachDtoList' : uploadFiles
+            // 'uploadFilesList' : uploadFilesList
+        });
+
+        $.ajax({
+            method: 'post',
+            url: '/boards', // 경로
+            processData: false, // 기본값은 true
+            contentType: 'application/json', // multipart/form-data타입을 사용하기위해 false로 지정합니다.
+            dataType: 'json',
+            data: boardInsertDto,
+
+            success: function (data) {
+                console.log(data);
+            },
+            error: function () {
+
+            }
+        }); //$.ajax
+    }
+    insertBtn.addEventListener("click", insertBoard);
+
+    const attachFiles = document.getElementById("attachFiles");
+    let uploadFiles = null;
+    function FileUpload() {
+        let formData = new FormData(); //FormData 객체 생성
+
+        let inputFile = $("input[type='file']");
+        // input 태그의 type이 file인것을 찾아서 inputFile이라는 변수로 지정
+
+        let files = inputFile[0].files;
+        // files : 선택한 모든 파일을 나열하는 FileList 객체입니다.
+        // multiple 특성을 지정하지 않았다면 두 개 이상의 파일을 포함하지 않습니다.
+
+        for (let i = 0; i < files.length; i++) {
+            console.log(files[i]);
+            formData.append("uploadFiles", files[i]);
+        }
+
+
+        // 실제 업로드 부분
+        // upload ajax
+        $.ajax({
+            url: '/uploadFiles', // 경로
+            processData: false, // 기본값은 true
+            // ajax 통신을 통해 데이터를 전송할 때, 기본적으로 key와 value값을 Query String으로 변환해서 보냅니다.
+            contentType: false, // multipart/form-data타입을 사용하기위해 false로 지정합니다.
+            data: formData,
+            type: 'POST',
+            dataType: 'json',
+            success: function (result) {
+                // 나중에 화면 처리
+                console.log(result);
+                uploadFiles = result;
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+            }
+        }); //$.ajax
+    }
+
+    attachFiles.addEventListener("change", FileUpload);
+</script>
+</body>
+</html>
