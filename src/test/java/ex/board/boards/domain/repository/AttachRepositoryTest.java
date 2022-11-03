@@ -22,7 +22,7 @@ import ex.board.boards.service.dto.BoardInsertDto;
 class AttachRepositoryTest {
 
     @Autowired
-    AttachRepository attachRepository; ////
+    AttachRepository attachRepository;
 
     @Autowired
     BoardRepository boardRepository;
